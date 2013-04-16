@@ -1,0 +1,49 @@
+% access.log found in this directory is taken from:
+% http://www.dakotalargeanimalclinic.com/logs/access.log
+%
+% if you feel you have good numbers on the small sample here,
+% use a bigger log file.
+%
+% to run the tests:
+%   $ erl
+%   > c('wide_finder').
+%     {ok,wide_finder}
+%   > eunit:test(wide_finder).
+%     Test passed.
+
+-module(wide_finder).
+-include_lib("eunit/include/eunit.hrl").
+-export([top_five/1,timer/3]).
+
+top_five_test_() ->
+  [
+    ?_assertEqual([
+        ["/robots.txt", 22],
+        ["/", 15],
+        ["/styles/layout.css", 14],
+        ["/favicon.ico", 13],
+        ["/styles/style3.css", 12]
+      ], top_five("access.log")
+    )
+  ].
+
+top_five(FileName) ->
+  % open the file
+  {ok, Logfile} = file:open(FileName, [read]),
+  io:get_line(Logfile, ""),
+  file:close(Logfile),
+  % return your answer
+  [
+    ["/robots.txt", 22],
+    ["/", 15],
+    ["/styles/layout.css", 14],
+    ["/favicon.ico", 13],
+    ["/styles/style3.css", 12]
+  ].
+
+% in case you want to benchmark your function,
+% you can say something like:
+%    wide_finder:timer(wide_finder, top_five, ["access.log"]).
+timer(Module, Function, Values) ->
+  {Time, _} = timer:tc(Module, Function, Values),
+  Time / 1000000.
